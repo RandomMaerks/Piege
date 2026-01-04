@@ -14,6 +14,8 @@ Piège files have the `.piege` file extension. The interpreter is the `piegeur.p
 
 For detailed information about syntaxes and sample codes of this language, [read this document](https://docs.google.com/document/d/1WAAu7p1CHTn9_E9xxxhv4B_jBKVATX67ZG5KDJ2ysMM).
 
+**Small warning**: This and the programming language itself are made by me, an extremely nooby programmer. Please don't use them in actual projects. You're also welcome to give feedback and make changes if necessary.
+
 
 ## Version history
 
