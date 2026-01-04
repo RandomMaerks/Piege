@@ -1,24 +1,21 @@
-<p style="text-align: center; font-size: 30px">
-<b>— Piège PyInterpreter —</b>
-</p>
+# **Piègeur** — A Python interpreter for Piège
+Current version: **0.1.4** *(04 January, 2026)*
 
-<p style="text-align: center; font-size: 20px">
-<i>INTERPRETER FOR <b>PIÈGE</b> – A MATH-FOCUSED INTERPRETED LANGUAGE</i><br>
-<i>VERSION 0.1.4 (04 January, 2026)</i>
-</p>
 
 ## Preamble
 This is the official repository of the Python interpreter and math library for the Piège programming language.
 
-**Piège** /ˈpɪ.eʒ/ is an overglorified scientific calculator which I fabricated out of thin air, and it is used to compute various sorts of mathematical operations.
+**Piège** /ˈpɪ.eʒ/ is a mathematically-focused interpreted language which is used to compute various sorts of mathematical operations.
 
-Piège is an interpreted language which has the `.piege` file extension. The interpreter is the `interpreter.py` file. The interpreter also uses `mathPiege.py` as a library for math operations.
+Piège files have the `.piege` file extension. The interpreter is the `piegeur.py` file. The interpreter also uses `mathPiege.py` as a library for math operations.
 
 For detailed information about syntaxes and sample codes of this language, [read this document](https://docs.google.com/document/d/1WAAu7p1CHTn9_E9xxxhv4B_jBKVATX67ZG5KDJ2ysMM).
 
-## Piège PyInterpreter
 
 ## Version history
+
+### v0.1.4 (04 January, 2026)
+- Released project to GitHub
 
 ### v0.1.3 (04 January, 2026)
 - Changed `moveCursor[]` of version 0.1.2 to `setCursor[]`
