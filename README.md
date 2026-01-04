@@ -16,6 +16,7 @@ For detailed information about syntaxes and sample codes of this language, [read
 
 ### v0.1.4 (04 January, 2026)
 - Released project to GitHub
+- Changed `interpreter.py` file name to `piegeur.py`
 
 ### v0.1.3 (04 January, 2026)
 - Changed `moveCursor[]` of version 0.1.2 to `setCursor[]`
