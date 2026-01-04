@@ -1,5 +1,8 @@
-# **Piègeur** — A Python interpreter for Piège
-Current version: **0.1.4** *(04 January, 2026)*
+<div align="center" style="display: grid; place-items: center;">
+<h1>Piègeur</h1>
+<h3>A Python interpreter for Piège</h3>
+<p>v0.1.4 (04 January, 2026)</p><br>
+</div>
 
 
 ## Preamble
