@@ -1,8 +1,8 @@
 <div align="center" style="display: grid; place-items: center;">
+  <img src="https://github.com/RandomMaerks/Piege/blob/main/piege.png" width=10% height=10%>
   <h1>Piège</h1>
   <h3>Repo for the <a href="https://github.com/RandomMaerks/Piege/wiki">Documentation</a> and the Python interpreter</h3>
-  <p>Piègeur v0.1.4 | Piège v1.0</p>
-  <br>
+  <p>Piègeur v0.1.4 | Piège v1.0</p><br>
 </div>
 
 
