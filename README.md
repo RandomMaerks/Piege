@@ -8,13 +8,13 @@
 ## Preamble
 This is the official repository of the Python interpreter and math library for the Piège programming language.
 
-**Piège** /ˈpɪ.eʒ/ is a mathematically-focused interpreted language which is used to compute various sorts of mathematical operations.
+**Piège** /ˈpɪ.eʒ/ is a mathematically-focused interpreted language which is used to compute various sorts of mathematical operations. Piège files have the `.piege` file extension.
 
-Piège files have the `.piege` file extension. The interpreter is the `piegeur.py` file. The interpreter also uses `mathPiege.py` as a library for math operations.
+**Piègeur** /pɪ.ˈe.ʒœ/ is the official Python interpreter for Piège, which is the `piegeur.py` file. The interpreter also uses `mathPiege.py` as a custom-made library for math operations.
 
 For detailed information about syntaxes and sample codes of this language, [read this document](https://docs.google.com/document/d/1WAAu7p1CHTn9_E9xxxhv4B_jBKVATX67ZG5KDJ2ysMM).
 
-**Small warning**: This and the programming language itself are made by me, an extremely nooby programmer. Please don't use them in actual projects. You're also welcome to give feedback and make changes if necessary.
+**Small warning**: This and the programming language itself are made by me, an extremely nooby programmer. Tinker around, have fun, and please don't use these things in actual projects. You're also welcome to give feedback and make changes if necessary.
 
 
 ## Version history
