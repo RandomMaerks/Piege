@@ -17,6 +17,16 @@ For detailed information about syntaxes and sample codes of this language, [read
 **Small warning**: This and the programming language itself are made by me, an extremely nooby programmer. Tinker around, have fun, and please don't use these things in actual projects. You're also welcome to give feedback and make changes if necessary.
 
 
+## Functionality
+Both Piègeur and Piège are developed side by side, so most (if not all) functions will be present in the interpreter and will function as intended.
+
+Just like how Piège code is meant to be read, Piègeur reads through each and every single character in the code, while keeping track of the character index.
+
+Additionally, the interpreter uses built-in Python lists as temporary memory for: (a) variable names and their respective assigned value, (b) pairs of indices to ignore, and (c) instances of line breaks.
+
+Piègeur detects and runs every Piège file in the same directory as itself, and the temporary memory will be wiped when changing files.
+
+
 ## Version history
 
 ### v0.1.4 (04 January, 2026)
