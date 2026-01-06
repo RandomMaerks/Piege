@@ -15,7 +15,7 @@ This is the official repository for the Documentation of the Piège programming 
 
 **Small warning**: The interpreter and the language itself are made by me, an extremely nooby programmer. Tinker around, have fun, and please don't use these things in actual projects. You're also welcome to give feedback and make changes if necessary.
 
-## How to use
+## How to use Piègeur
 
 The latest version of Piègeur (v0.1.4) only comes with 2 files:
 - `piegeur.py` file for code interpreting
