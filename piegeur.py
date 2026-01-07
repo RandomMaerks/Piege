@@ -395,8 +395,7 @@ for fileIndex in piegeFiles:
                             if charIndex2 > tempLineBreak[index]:
                                 errorAtLine = index + 1
                                 break
-                        print(f"Error: Line {errorAtLine}, function setCursor[] operator {tempOp[maxIndex]}{', '.join(tempValueOp2)}).")
-                        str(input(''))
+                        str(input(f"InvalidComparator, line {errorAtLine}: Cannot execute comparison \"{tempComparator}\"."))
 
                     if verdict == True:
                         if typeToUse == "char":
@@ -491,8 +490,7 @@ for fileIndex in piegeFiles:
                             if charIndex2 > tempLineBreak[index]:
                                 errorAtLine = index + 1
                                 break
-                        print(f"Error: Line {errorAtLine}, function setCursor[] operator {tempOp[maxIndex]}{', '.join(tempValueOp2)}).")
-                        str(input(''))
+                        str(input(f"InvalidComparator, line {errorAtLine}: Cannot execute comparison \"{tempComparator}\"."))
 
                     if verdict == True:
                         if typeToUse == "char":
