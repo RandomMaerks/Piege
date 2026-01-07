@@ -1,6 +1,6 @@
 
 ### PYTHON INTERPRETER FOR PIÈGE
-### VERSION 0.1.4 (04 JANUARY 2026)
+### VERSION 0.1.5 (07 JANUARY 2026)
 ### AUTHOR: RANDOMMAERKS (BAO NGUYEN)
 ###
 ### LICENSED UNDER THE MIT LICENSE
@@ -13,13 +13,19 @@ import time
 # Hardcoded math operator syntaxes
 mathSyntax = ["sum(", "dif(", "sub(", "pro(", "rat(",
               "quo(", "pow(", "mod(", "fact(", "abs(",
-              "log(", "sqrt(", "root(", "det(", "dot("]
+              "log(", "sqrt(", "root(", "floor(", "ceil(",
+              "round(", "floorRat(", "ceilRat(", "sin(", "cos(",
+              "tan(", "cot(", "sec(", "csc(", "asin(",
+              "acos(", "atan(", "acot(", "asec(", "acsc(",
+              "sinh(", "cosh(", "tanh(", "coth(", "sech(",
+              "csch(", "detMtrx(", "lenVect(", "dotVect(", "exp(",
+              "ln("]
 
 compSyntax = ["less(", "more(", "equal(",
               "notless(", "notmore(", "notequal("]
 
 # Hardcoded characters to check for each type of data
-numberType = "0123456789.-e"
+numberType = "0123456789.+-e"
 charType = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 piegeFiles = [f for f in os.listdir('.') if f.endswith('.piege')]
@@ -27,8 +33,8 @@ piegeFiles = [f for f in os.listdir('.') if f.endswith('.piege')]
 for fileIndex in piegeFiles:
     
     # Temporary lists for variables and values through related index
-    tempVariable = []
-    tempValue    = []
+    tempVariable = ["NullValue", "ComplexInfinity", "pi"]
+    tempValue    = [float("0"), float("inf"), 3.1415926535897932]
 
     # Temporary list for position of line breaks
     tempLineBreak = [0]
@@ -99,14 +105,16 @@ for fileIndex in piegeFiles:
 
                 # Detect do[] function
                 if all(data[charIndex2+i] == "do["[i] for i in range(len("do["))):
+
+                    # Preparation
+                    
                     indentLevel = 0
-
-                    # Perform operation
-
                     tempOp = []
                     tempIndentOp = []
                     tempCommandList = []
                     tempFreqOp = []
+
+                    # Read from code to write to tempCommand
 
                     charIndex3 = charIndex2+len("do[")
                     while charIndex3 < len(data):
@@ -114,26 +122,32 @@ for fileIndex in piegeFiles:
                             charIndex2 = charIndex3 + 1
                             break
                         else:
+                            foundOp = ""
                             for syntax in mathSyntax:
                                 if all(data[charIndex3+i] == syntax[i] for i in range(len(syntax))):
+                                    foundOp = syntax
                                     tempOp.append(syntax)
                                     indentLevel += 1
                                     tempIndentOp.append(indentLevel)
+                                    tempFreqOp.append(tempOp.count(syntax))
+                                    break
                             if data[charIndex3] == ")":
                                 indentLevel -= 1
-                        tempCommandList.append(data[charIndex3])
-                        charIndex3 += 1
+                        if foundOp == "": 
+                            tempCommandList.append(data[charIndex3])
+                            charIndex3 += 1
+                        else:
+                            tempCommandList.append(foundOp)
+                            charIndex3 += len(foundOp)
 
                     tempCommand = ''.join(tempCommandList)
 
-                    for index in range(len(tempOp)):
-                        tempFreqOpList = []
-                        for index2 in range(0, index):
-                            if tempOp[index2] == tempOp[index]:
-                                tempFreqOpList.append(tempOp[index2])
-                        tempFreqOp.append(len(tempFreqOpList))
+                    # Run tempCommand while # of operators left is not 0
 
                     while len(tempOp) != 0:
+
+                        # Find operator whose indentLevel is highest
+                        
                         maxIndent = max(tempIndentOp)
                         maxIndex = tempIndentOp.index(maxIndent)
                         functionIndex = 0
@@ -143,9 +157,13 @@ for fileIndex in piegeFiles:
                             elif all(tempCommand[charIndex3+i] == tempOp[maxIndex][i] for i in range(len(tempOp[maxIndex]))):
                                 functionIndex = charIndex3
                                 tempFreqIndex += 1
+
+                        # Read tempCommand and run said operator
                                 
                         indentLevel = 0
                         for charIndex3 in range(functionIndex+len(tempOp[maxIndex]), len(tempCommand)):
+
+                            # Get literal input
                             
                             if tempCommand[charIndex3] == ")": break
                             
@@ -165,53 +183,39 @@ for fileIndex in piegeFiles:
                                     tempValueList = []
                                 else: tempValueList.append(tempCommand[charIndex4])
 
+                            # Translate to float if input is of numberType or get values from variable if input is of text
+
                             tempValueOp2 = []
 
                             for index in range(len(tempValueOp)):
                                 if all(tempValueOp[index][i] in numberType for i in range(len(tempValueOp[index]))):
                                     tempValueOp2.append(float(tempValueOp[index]))
                                 else:
-                                    varValue = tempValue[tempVariable.index(tempValueOp[index])]
-                                    tempValueOp2.append(varValue)
+                                    try:
+                                        varValue = tempValue[tempVariable.index(tempValueOp[index])]
+                                        tempValueOp2.append(varValue)
+                                    except Exception:
+                                        for index in range(len(tempLineBreak)):
+                                            if charIndex2 > tempLineBreak[index] and charIndex2 < tempLineBreak[index+1]:
+                                                errorAtLine = index + 1
+                                                break
+                                        str(input(f"NoVariable, line {errorAtLine}: Variable \"{''.join(tempValueOp)}\" does not exist, returning 0."))
+                                        tempValueOp2.append(0)
+                                        
 
-                            if tempOp[maxIndex] == mathSyntax[0]: #sum
-                                answer = mathPiege.sum(tempValueOp2)
+                            # Detect function and run
 
-                            elif tempOp[maxIndex] == mathSyntax[1]: #dif
-                                answer = mathPiege.difference(tempValueOp2[0], tempValueOp2[1])
+                            code = f"answer = mathPiege.{tempOp[maxIndex]}{tempValueOp2})"
+                            try:
+                                exec(code)
+                            except Exception:
+                                for index in range(len(tempLineBreak)):
+                                    if charIndex2 > tempLineBreak[index] and charIndex2 < tempLineBreak[index+1]:
+                                        errorAtLine = index + 1
+                                        break
+                                str(input(f"InvalidCommand, line {errorAtLine}: Cannot execute command \"{tempCommand}\"."))
 
-                            elif tempOp[maxIndex] == mathSyntax[2]: #sub
-                                answer = mathPiege.subtraction(tempValueOp2)
-
-                            elif tempOp[maxIndex] == mathSyntax[3]: #pro
-                                answer = mathPiege.product(tempValueOp2)
-
-                            elif tempOp[maxIndex] == mathSyntax[4]: #rat
-                                answer = mathPiege.ratio(tempValueOp2[0], tempValueOp2[1])
-
-                            elif tempOp[maxIndex] == mathSyntax[5]: #quo
-                                answer = mathPiege.quotient(tempValueOp2)
-
-                            elif tempOp[maxIndex] == mathSyntax[6]: #pow
-                                answer = mathPiege.power(tempValueOp2[0], tempValueOp2[1])
-
-                            elif tempOp[maxIndex] == mathSyntax[7]: #mod
-                                answer = mathPiege.mod(tempValueOp2[0], tempValueOp2[1])
-
-                            elif tempOp[maxIndex] == mathSyntax[8]: #fact
-                                answer = mathPiege.factorial(tempValueOp2[0])
-
-                            elif tempOp[maxIndex] == mathSyntax[9]: #abs
-                                answer = mathPiege.absolute(tempValueOp2[0])
-
-                            elif tempOp[maxIndex] == mathSyntax[10]: #log
-                                answer = mathPiege.logarithm(tempValueOp2[0], tempValueOp2[1])
-
-                            elif tempOp[maxIndex] == mathSyntax[11]: #sqrt
-                                answer = mathPiege.sqrt(tempValueOp2[0])
-
-                            elif tempOp[maxIndex] == mathSyntax[12]: #root
-                                answer = mathPiege.root(tempValueOp2[0], tempValueOp2[1])   
+                            # Remove part of tempCommand which has been executed
                                 
                             for charIndex4 in range(charIndex3, lastInstance):
                                 tempCommand = tempCommand[:charIndex3] + tempCommand[charIndex3 + 1:]
@@ -228,6 +232,7 @@ for fileIndex in piegeFiles:
                     
                     for charIndex3 in range(charIndex2, len(data)):
                         if all(data[charIndex3+i] == "];"[i] for i in range(len("];"))):
+                            charIndex2 = charIndex3 + 2
                             break
                         elif data[charIndex3] == " ": continue
                         else: tempVarList.append(data[charIndex3])
@@ -244,8 +249,16 @@ for fileIndex in piegeFiles:
                         if all(tempCommand[i] in numberType for i in range(len(tempCommand))):
                             tempValue[tempVariable.index(varName)] = float(tempCommand)
                         else:
-                            varValue = tempValue[tempVariable.index(tempCommand)]
-                            tempValue[tempVariable.index(varName)] = float(varValue)
+                            try:
+                                varValue = tempValue[tempVariable.index(tempCommand)]
+                                tempValue[tempVariable.index(varName)] = float(varValue)
+                            except Exception:
+                                for index in range(len(tempLineBreak)):
+                                    if charIndex2 > tempLineBreak[index] and charIndex2 < tempLineBreak[index+1]:
+                                        errorAtLine = index + 1
+                                        break
+                                str(input(f"InvalidAssignment, line {errorAtLine}: Cannot assign \"{tempCommand}\" to variable \"{varName}\", assigning NullValue."))
+                                tempValue[tempVariable.index(varName)] = tempValue[0]
                         
                 # Detect return[] function
                 elif all(data[charIndex2+i] == "return["[i] for i in range(len("return["))):
@@ -370,32 +383,27 @@ for fileIndex in piegeFiles:
                             varValue = tempValue[tempVariable.index(tempValueComp[index])]
                             tempValueComp2.append(varValue)
 
-                    verdict = "False"
+                    verdict = False
 
-                    if tempCompOp == compSyntax[0]: # less()
-                        if tempValueComp2[0] < tempValueComp2[1]: verdict = "True"
+                    # Detect function and run
 
-                    elif tempCompOp == compSyntax[1]: # more()
-                        if tempValueComp2[0] > tempValueComp2[1]: verdict = "True"
+                    code = f"verdict = mathPiege.{tempCompOp}{tempValueComp2})"
+                    try:
+                        exec(code)
+                    except Exception:
+                        for index in range(len(tempLineBreak)):
+                            if charIndex2 > tempLineBreak[index]:
+                                errorAtLine = index + 1
+                                break
+                        print(f"Error: Line {errorAtLine}, function setCursor[] operator {tempOp[maxIndex]}{', '.join(tempValueOp2)}).")
+                        str(input(''))
 
-                    elif tempCompOp == compSyntax[2]: # equal()
-                        if tempValueComp2[0] == tempValueComp2[1]: verdict = "True"
-
-                    elif tempCompOp == compSyntax[3]: # notless()
-                        if tempValueComp2[0] >= tempValueComp2[1]: verdict = "True"
-
-                    elif tempCompOp == compSyntax[4]: # notmore()
-                        if tempValueComp2[0] <= tempValueComp2[1]: verdict = "True"
-
-                    elif tempCompOp == compSyntax[5]: # notequal()
-                        if tempValueComp2[0] != tempValueComp2[1]: verdict = "True"
-
-                    if verdict == "True":
+                    if verdict == True:
                         if typeToUse == "char":
                             charIndex2 = indexToGo - 1
                         elif typeToUse == "line":
                             charIndex2 = tempLineBreak[indexToGo - 1]
-                    elif verdict == "False":
+                    elif verdict == False:
                         charIndex2 = lastInstance
 
                 # Detect moveCursor[] function
@@ -471,27 +479,22 @@ for fileIndex in piegeFiles:
                             varValue = tempValue[tempVariable.index(tempValueComp[index])]
                             tempValueComp2.append(varValue)
 
-                    verdict = "False"
+                    verdict = False
 
-                    if tempCompOp == compSyntax[0]: # less()
-                        if tempValueComp2[0] < tempValueComp2[1]: verdict = "True"
+                    # Detect function and run
 
-                    elif tempCompOp == compSyntax[1]: # more()
-                        if tempValueComp2[0] > tempValueComp2[1]: verdict = "True"
+                    code = f"verdict = mathPiege.{tempCompOp}{tempValueComp2})"
+                    try:
+                        exec(code)
+                    except Exception:
+                        for index in range(len(tempLineBreak)):
+                            if charIndex2 > tempLineBreak[index]:
+                                errorAtLine = index + 1
+                                break
+                        print(f"Error: Line {errorAtLine}, function setCursor[] operator {tempOp[maxIndex]}{', '.join(tempValueOp2)}).")
+                        str(input(''))
 
-                    elif tempCompOp == compSyntax[2]: # equal()
-                        if tempValueComp2[0] == tempValueComp2[1]: verdict = "True"
-
-                    elif tempCompOp == compSyntax[3]: # notless()
-                        if tempValueComp2[0] >= tempValueComp2[1]: verdict = "True"
-
-                    elif tempCompOp == compSyntax[4]: # notmore()
-                        if tempValueComp2[0] <= tempValueComp2[1]: verdict = "True"
-
-                    elif tempCompOp == compSyntax[5]: # notequal()
-                        if tempValueComp2[0] != tempValueComp2[1]: verdict = "True"
-
-                    if verdict == "True":
+                    if verdict == True:
                         if typeToUse == "char":
                             charIndex2 += indexToGo
                         elif typeToUse == "line":
@@ -500,7 +503,7 @@ for fileIndex in piegeFiles:
                                 if data[charIndex3] == "\n":
                                     tempLineBreakValue += 1
                             charIndex2 = tempLineBreak[tempLineBreakValue + indexToGo]
-                    elif verdict == "False":
+                    elif verdict == False:
                         charIndex2 = lastInstance
                 
                 # Detect getIndex[] function

@@ -2,7 +2,7 @@
   <img src="https://github.com/RandomMaerks/Piege/blob/main/piege.png" width=10% height=10%>
   <h1>Piège</h1>
   <h3>Repo for the <a href="https://github.com/RandomMaerks/Piege/wiki">Documentation</a> and the Python interpreter</h3>
-  <p>Piègeur v0.1.4 | Piège v1.0</p><br>
+  <p>Piègeur v0.1.5 | Piège v1.0</p><br>
 </div>
 
 
@@ -17,7 +17,7 @@ This is the official repository for the Documentation of the Piège programming 
 
 ## How to use Piègeur
 
-The latest version of Piègeur (v0.1.4) only comes with 2 files:
+The latest version of Piègeur (v0.1.5) only comes with 2 files:
 - `piegeur.py` file for code interpreting
 - `mathPiege.py` as a library for math operators and comparison operators
 

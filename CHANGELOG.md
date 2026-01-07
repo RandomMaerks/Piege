@@ -1,4 +1,10 @@
-## Piègeur changelog
+## Piègeur & mathPiège library changelog
+
+### v0.1.5 (07 January, 2026)
+- Added `NullValue = 0`, `ComplexInfinity = inf`, `pi = 3.1415926535897932` in `tempVariable` and `tempValue` lists
+- Added 3 custom errors: `NoVariable`, `InvalidCommand`, `InvalidVariable`
+- Slightly changed `do[]` function to avoid potential duplicate operators during reading (e.g. `arcsin(` read as `arcsin(` and `sin(`)
+- Added 24 trigonometric and hyperbolic operators, `exp()`, `ln()` operators for `do[]` function
 
 ### v0.1.4 (04 January, 2026)
 - Released project to GitHub
