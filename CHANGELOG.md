@@ -1,5 +1,12 @@
 ## Piègeur & mathPiège library changelog
 
+### v0.2.0 (16 January, 2026)
+- New IDE application using the PyQt5 framework
+- Added 19 statistical operators for the `do[]` function
+- Added `angle()`, `neg()`, `dist()`, `rand()`, `randInt()`, `sign()` for the do[] function
+- Changed parameters for all vector operators in do[]
+- Removed argument `type` for the `input[]` function
+
 ### v0.1.5 (07 January, 2026)
 - Added `NullValue = 0`, `ComplexInfinity = inf`, `pi = 3.1415926535897932` in `tempVariable` and `tempValue` lists
 - Added 4 custom errors: `NoVariable`, `InvalidCommand`, `InvalidVariable`, `InvalidComparator`
