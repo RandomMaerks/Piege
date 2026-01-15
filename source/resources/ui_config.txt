@@ -1,0 +1,4 @@
+self.fontNameUI = "Segoe UI"
+self.fontSizeUI = 9
+self.fontNameTextBox = "Iosevka SS14"
+self.fontSizeTextBox = 12
