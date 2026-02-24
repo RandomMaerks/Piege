@@ -16,9 +16,9 @@ from PyQt5.QtWidgets import (QAction, QApplication, QCheckBox, QLabel, QToolBar,
                              QGridLayout, QTextEdit, QPlainTextEdit, QPushButton,
                              QDialog, QFileDialog, QDialogButtonBox, QFontDialog)
 import pyqt5_fugueicons as fugue
-from interpreter import executeCode
+import interpreter
 from time import time
-from threading import *
+from threading import Thread
 from io import StringIO
 import contextlib
 
@@ -66,8 +66,8 @@ class DialogAbout(QDialog):
         self.label_Subtitle.setFont(QFont(self.fontNameUI, 12))
         self.label_Subtitle.setWordWrap(True)
 
-        self.label_Description = QLabel("\nIDE verion: 0.2.0 (16 January 2026)\n"
-                                        "Piège version: 1.4 (13 January 2026)\n\n"
+        self.label_Description = QLabel("\nIDE version: 0.3.0 (24 February 2026)\n"
+                                        "Supports Piège version: 2.0 (22 February 2026)\n\n"
                                         "Free & open-source software, licensed under terms of the MIT license.\n\n"
                                         "Piègeur /pɪ.ˈe.ʒœ/ is the official integrated development "
                                         "environment for the Piège programming language. This IDE "
@@ -330,6 +330,7 @@ class Piegeur(QMainWindow):
         spaceWidth = fontMetrics.width(" ")
         self.codeEditor.setTabStopDistance(spaceWidth * 4)
         self.codeEditor.textChanged.connect(self.textChanged)
+        self.codeEditor.cursorPositionChanged.connect(self.cursorChanged)
 
         self.label_Output = QLabel(f"Interpreter output", self)
         self.label_Output.setFont(QFont(self.fontNameUI, self.fontSizeUI))
@@ -339,12 +340,15 @@ class Piegeur(QMainWindow):
         self.outputWindow.setReadOnly(True)
 
         self.label_Runtime = QLabel(f"Runtime", self)
-        self.label_Runtime.setFont(QFont(self.fontNameUI, self.fontSizeUI))        
+        self.label_Runtime.setFont(QFont(self.fontNameUI, self.fontSizeUI))
 
         self.runtimeWindow = QTextEdit(self)
         self.runtimeWindow.setFont(QFont(self.fontNameTextBox, self.fontSizeTextBox))
         self.runtimeWindow.setReadOnly(True)
         self.runtimeWindow.setMaximumHeight(50)
+
+        self.label_CursorPos = QLabel(f"Line 1, character 1 index 0 ( )", self)
+        self.label_CursorPos.setFont(QFont(self.fontNameUI, self.fontSizeUI))
 
         self.grid = QGridLayout()
         self.grid.addWidget(self.label_CurrentFile, 0, 0)
@@ -353,6 +357,7 @@ class Piegeur(QMainWindow):
         self.grid.addWidget(self.outputWindow, 1, 1)
         self.grid.addWidget(self.label_Runtime, 2, 1)
         self.grid.addWidget(self.runtimeWindow, 3, 1)
+        self.grid.addWidget(self.label_CursorPos, 4, 0, 1, 2)
         
         self.centralWidget.setLayout(self.grid)
 
@@ -380,7 +385,7 @@ class Piegeur(QMainWindow):
         t1.start()
 
     def action_QuickSetup(self):
-        setupString = "io{\n	output[interpreter];\n};\nop{\n	\n};\n"
+        setupString = "# input-output\nOUTPUT interpreter\n\n# math operation\n"
         self.codeEditor.insertPlainText(setupString)
 
     def action_AboutDialog(self):
@@ -396,7 +401,7 @@ class Piegeur(QMainWindow):
         timeStart = time()
         with contextlib.redirect_stdout(outputStream):
             try:
-                executeCode(code)
+                interpreter.executeCode(code)
             except Exception as e:
                 print(e)
         timeEnd = time()
@@ -414,6 +419,19 @@ class Piegeur(QMainWindow):
     def textChanged(self):
         self.setWindowTitle(f"*Piègeur IDE - {self.dirDisplay}")
         self.savedState = False
+
+    def cursorChanged(self):
+        wholeText = self.codeEditor.toPlainText()
+        
+        charIndex = self.codeEditor.textCursor().position()
+        letterAtCharIndex = "" if charIndex > len(wholeText)-1 else wholeText[charIndex].replace("\n", "\\n")
+
+        lineBreaks = [index for index, char in enumerate(wholeText) if char == "\n"]
+        line = 1
+        for index, lineBreak in enumerate(lineBreaks):
+            if charIndex > lineBreak: line += 1
+
+        self.label_CursorPos.setText(f"Line {line}, character {charIndex+1} index {charIndex} ( {letterAtCharIndex} )")
 
     def action_ToggleLineNumber(self, s):
         if s == True: print("toggled on")

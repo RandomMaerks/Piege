@@ -1,8 +1,10 @@
 from time import time
+from decimal import *
 
 # Preset constant
-pi = 3.1415926535897932384626433832795
-e = 2.7182818284590452353602874713527
+
+pi = Decimal('3.1415926535897932384626433832795')
+e = Decimal('2.7182818284590452353602874713527')
 
 
 # Sorting algorithms
@@ -55,7 +57,7 @@ def pro(value):
 
 def rat(value):
     if value[1] != 0: return value[0] / value[1]
-    else: return "ComplexInfinity"
+    else: return Decimal("Infinity")
 
 def quo(value):
     quo = value[0]
@@ -96,7 +98,7 @@ def dif(value):
 def log(value):
     if value[1] == value[0]: return 1
     elif value[1] == 1: return 0
-    elif value[1] == 0: return "NullValue"
+    elif value[1] == 0: return Decimal("NaN")
     if value[0] > 1: a = -100
     else: a = 100
     b = -a
@@ -112,7 +114,7 @@ def log(value):
 def ln(value):
     if value[0] == e: return 1
     elif value[0] == 1: return 0
-    elif value[0] == 0: return "NullValue"
+    elif value[0] == 0: return Decimal("NaN")
     a = -100
     b = -a
     loopIndex = 1000    
@@ -210,7 +212,7 @@ def csc(value):
 
 def asin(value):
     value = value[0]
-    if abs([value]) > 1: return "NullValue"
+    if abs([value]) > 1: return Decimal("NaN")
     loopIndex = 1000
     a = -pi/2
     b = pi/2
@@ -246,7 +248,7 @@ def acot(value):
 
 def asec(value):
     value = value[0]
-    if abs([value]) < 1: return "NullValue"
+    if abs([value]) < 1: return Decimal("NaN")
     loopIndex = 1000
     a = 0
     b = pi
@@ -297,27 +299,27 @@ def asinh(value):
 
 def acosh(value):
     value = value[0]
-    if value < 1: return "NullValue"
+    if value < 1: return Decimal("NaN")
     return ln([value + sqrt([value**2 - 1])])
 
 def atanh(value):
     value = value[0]
-    if abs([value]) >= 1: return "NullValue"
+    if abs([value]) >= 1: return Decimal("NaN")
     return 0.5 * ln([rat([1 + value, 1 - value])])
 
 def acoth(value):
     value = value[0]
-    if abs([value]) <= 1: return "NullValue"
+    if abs([value]) <= 1: return Decimal("NaN")
     return 0.5 * ln([rat([value + 1, value - 1])])
 
 def asech(value):
     value = value[0]
-    if value <= 0 or value > 1: return "NullValue"
+    if value <= 0 or value > 1: return Decimal("NaN")
     return ln([rat([1, value]) + sqrt([rat([1, value**2]) - 1])])
 
 def acsch(value):
     value = value[0]
-    if value == 0: return "NullValue"
+    if value == 0: return Decimal("NaN")
     return ln([rat([1, value]) + sqrt([rat([1, value**2]) + 1])])
 
 
@@ -497,6 +499,7 @@ def quart3(value):
 def iqr(value):
     return quart3(value) - quart1(value)
 
+
 # Algebraic operators
 
 def constant(value):
@@ -519,7 +522,7 @@ def quadratic(value):
             x = (-value[1]) / (2 * value[0])
             return [x]
         if delta < 0:
-            return ["NullValue"]
+            return [Decimal("NaN")]
 
 def ratioNum(value):
     return [(value[0] / value[1]) * value[2]]

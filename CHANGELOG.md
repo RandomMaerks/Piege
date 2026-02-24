@@ -1,5 +1,11 @@
 ## Piègeur & mathPiège library changelog
 
+### v0.3.0 (24 Februrary, 2026)
+- Rewrote all function detection scripts, improving speed
+- Updated interpreter to match with Piège version 2.0 (capitalise function names, remove `io{}` and `op{}`, edit function syntaxes, etc.)
+- Implemented `VISUAL` function & added `visualiser.py`
+- Used Decimal library instead of relying on built-in float type
+
 ### v0.2.0 (16 January, 2026)
 - New IDE application using the PyQt5 framework
 - Added 19 statistical operators for the `do[]` function
