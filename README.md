@@ -32,6 +32,10 @@ Next, use PyInstaller to compile the program:
 ```
 py -m PyInstaller --onefile --noconsole --i=resources/piege.ico --version-file=version.txt Piegeur.py
 ``` 
+Instead of using the `--onefile` flag, you can also use the `--onedir` flag to compile into a folder instead:
+```
+py -m PyInstaller --onedir --noconsole --i=resources/piege.ico --version-file=version.txt Piegeur.py
+``` 
 Make sure the current directory is `../source/`.
 
 There should be a `build` and a `dist` folder. The `.exe` will be placed in the `dist` folder.
