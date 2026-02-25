@@ -2,7 +2,7 @@
   <img src="https://github.com/RandomMaerks/Piege/blob/main/piege.png" width=13% height=13%>
   <h1>Piège</h1>
   <h3>Repo for the <a href="https://github.com/RandomMaerks/Piege/wiki">Documentation</a> and the Python interpreter</h3>
-  <p>Piègeur v0.3.0 | Piège v2.0</p><br>
+  <p>Piège v2.1 | Piègeur v0.3.0</p><br>
   <img width="964" height="672" alt="image" src="https://github.com/user-attachments/assets/03300284-7232-48fd-b005-ee81b82c9c80" />
 </div>
 
