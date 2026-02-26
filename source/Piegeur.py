@@ -1,12 +1,3 @@
-"""
-PIÈGEUR IDE FOR THE PIÈGE PROGRAMMING LANGUAGE
-AUTHOR: RANDOMMAERKS (BAO NGUYEN)
-VERSION: 0.2.0 (16 JANUARY 2026)
-
-LICENSE: THE MIT LICENSE
-CHECK OUT `LICENSE.TXT` FOR MORE INFORMATION
-"""
-
 import sys
 import os
 from PyQt5.QtCore import Qt, QUrl
@@ -21,6 +12,7 @@ from time import time
 from threading import Thread
 from io import StringIO
 import contextlib
+import decimal
 
 
 class DialogAbout(QDialog):
@@ -31,7 +23,7 @@ class DialogAbout(QDialog):
 
         self.setFixedWidth(400)
 
-        with open("resources/ui_config.txt", "r", encoding="utf-8") as file:
+        with open("resources/ui_config.txt", "r", encoding="utf8") as file:
             uiConfigFile = file.readlines()
             for line in uiConfigFile:
                 exec(line)
@@ -66,8 +58,8 @@ class DialogAbout(QDialog):
         self.label_Subtitle.setFont(QFont(self.fontNameUI, 12))
         self.label_Subtitle.setWordWrap(True)
 
-        self.label_Description = QLabel("\nIDE version: 0.3.0 (24 February 2026)\n"
-                                        "Supports Piège version: 2.0 (22 February 2026)\n\n"
+        self.label_Description = QLabel("\nIDE version: 0.3.1 (27 February 2026)\n"
+                                        "Supports Piège version: 2.1 (25 February 2026)\n\n"
                                         "Free & open-source software, licensed under terms of the MIT license.\n\n"
                                         "Piègeur /pɪ.ˈe.ʒœ/ is the official integrated development "
                                         "environment for the Piège programming language. This IDE "
@@ -99,7 +91,7 @@ class DialogUnsaved(QDialog):
         
         self.setFixedWidth(300)
 
-        with open("resources/ui_config.txt", "r", encoding="utf-8") as file:
+        with open("resources/ui_config.txt", "r", encoding="utf8") as file:
             uiConfigFile = file.readlines()
             for line in uiConfigFile:
                 exec(line)
@@ -148,13 +140,13 @@ class Piegeur(QMainWindow):
 
         if not os.path.exists("resources/ui_config.txt"):
             os.makedirs(os.path.dirname("resources/"))
-            with open("resources/ui_config.txt", "w", encoding="utf-8") as file:
+            with open("resources/ui_config.txt", "w", encoding="utf8") as file:
                 file.write("self.fontNameUI = \"Segoe UI\"\n"
                            "self.fontSizeUI = 9\n"
                            "self.fontNameTextBox = \"Consolas\"\n"
                            "self.fontSizeTextBox = 10")
 
-        with open("resources/ui_config.txt", "r", encoding="utf-8") as file:
+        with open("resources/ui_config.txt", "r", encoding="utf8") as file:
             uiConfigFile = file.readlines()
             for line in uiConfigFile:
                 exec(line)
@@ -462,7 +454,7 @@ class Piegeur(QMainWindow):
         fileDir, _ = QFileDialog.getSaveFileName(self, "New", self.currentDir, "Piège files (*.piege)")
         if fileDir:
             self.currentFile = fileDir
-            with open(self.currentFile, "w") as file:
+            with open(self.currentFile, "w", encoding="utf8") as file:
                 file.write("")
             self.currentDir = os.path.dirname(self.currentFile)
             self.codeEditor.setPlainText("")
@@ -476,7 +468,7 @@ class Piegeur(QMainWindow):
         fileDir, _ = QFileDialog.getOpenFileName(self, "Open", self.currentDir, "Piège files (*.piege)")
         if fileDir:
             self.currentFile = fileDir
-            with open(self.currentFile, "r") as file:
+            with open(self.currentFile, "r", encoding="utf8") as file:
                 code = file.read()
             self.currentDir = os.path.dirname(self.currentFile)
             self.codeEditor.setPlainText(code)
@@ -492,7 +484,7 @@ class Piegeur(QMainWindow):
             else: return None
             self.currentDir = os.path.dirname(self.currentFile)
         code = self.codeEditor.toPlainText()
-        with open(self.currentFile, "w", encoding="utf-8") as file:
+        with open(self.currentFile, "w", encoding="utf8") as file:
             file.write(code)
         self.button_CloseFile.setDisabled(False)
         self.savedState = True
@@ -504,7 +496,7 @@ class Piegeur(QMainWindow):
         else: return None
         self.currentDir = os.path.dirname(self.currentFile)
         code = self.codeEditor.toPlainText()
-        with open(self.currentFile, "w", encoding="utf-8") as file:
+        with open(self.currentFile, "w", encoding="utf8") as file:
             file.write(code)
         self.button_CloseFile.setDisabled(False)      
         self.savedState = True
@@ -542,11 +534,11 @@ class Piegeur(QMainWindow):
             fontData = font.toString().split(",")
             self.fontNameTextBox = fontData[0]
             self.fontSizeTextBox = int(fontData[1])
-            with open("resources/ui_config.txt", "r", encoding="utf-8") as file:
+            with open("resources/ui_config.txt", "r", encoding="utf8") as file:
                 uiConfigFile = file.readlines()
                 uiConfigFile[2] = f"self.fontNameTextBox = \"{self.fontNameTextBox}\"\n"
                 uiConfigFile[3] = f"self.fontSizeTextBox = {self.fontSizeTextBox}"
-            with open("resources/ui_config.txt", "w", encoding="utf-8") as file:
+            with open("resources/ui_config.txt", "w", encoding="utf8") as file:
                 file.writelines(uiConfigFile)
 
 def main():

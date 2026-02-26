@@ -24,7 +24,7 @@ def selectionSort(value):
 def insertionSort(value):
     n = len(value)
     if n <= 1:
-        return
+        return value
     for i in range(1, n):
         temp = value[i]         
         j = i - 1
@@ -38,7 +38,7 @@ def insertionSort(value):
 # Arithmetical operators
 
 def sum(value):
-    sum = 0
+    sum = Decimal(0)
     for index in value:
         sum += index
     return sum
@@ -50,14 +50,14 @@ def sub(value):
     return sub
 
 def pro(value):
-    pro = 1
+    pro = Decimal(1)
     for index in value:
         pro *= index
     return pro
 
 def rat(value):
     if value[1] != 0: return value[0] / value[1]
-    else: return Decimal("Infinity")
+    else: return Decimal("NaN")
 
 def quo(value):
     quo = value[0]
@@ -105,8 +105,8 @@ def log(value):
     loopIndex = 1000
     while loopIndex != 0:
         meanExp = (a + b) / 2
-        if value[0] ** meanExp < value[1]: a = meanExp
-        elif value[0] ** meanExp > value[1]: b = meanExp
+        if value[0] ** Decimal(meanExp) < value[1]: a = meanExp
+        elif value[0] ** Decimal(meanExp) > value[1]: b = meanExp
         else: break
         loopIndex -= 1
     return meanExp
@@ -120,20 +120,20 @@ def ln(value):
     loopIndex = 1000    
     while loopIndex != 0:
         meanExp = (a + b) / 2
-        if e ** meanExp < value[0]: a = meanExp
-        elif e ** meanExp > value[0]: b = meanExp
+        if e ** Decimal(meanExp) < value[0]: a = meanExp
+        elif e ** Decimal(meanExp) > value[0]: b = meanExp
         else: break
         loopIndex -= 1
     return meanExp
 
 def sqrt(value):
-    return value[0] ** 0.5
+    return Decimal(value[0]) ** Decimal(0.5)
 
 def root(value):
-    return value[1] ** (1/value[0])
+    return Decimal(value[1]) ** 1/value[0]
 
 def neg(value):
-    return - abs([value[0]])
+    return -Decimal(value[0])
 
 
 # Rounding operators
@@ -170,10 +170,10 @@ def sin(value):
     step = 0
     threshold = pow([10, -16])
     value %= 2*pi
-    mainResult = ((-1)**step / fact([2*step + 1])) * value**(2*step + 1)
+    mainResult = Decimal((-1)**step / fact([2*step + 1])) * value**(2*step + 1)
     while True:
         step += 1
-        nextResult = ((-1)**step / fact([2*step + 1])) * value**(2*step + 1)
+        nextResult = Decimal((-1)**step / fact([2*step + 1])) * value**(2*step + 1)
         tempResult = mainResult + nextResult
         if dif([mainResult, tempResult]) <= threshold:
             break
@@ -185,10 +185,11 @@ def cos(value):
     step = 0
     threshold = pow([10, -16])
     value %= 2*pi
-    mainResult = ((-1)**step / fact([2*step])) * value**(2*step)
+    if value == 0: return 1
+    mainResult = Decimal((-1)**step / fact([2*step])) * value**(2*step)
     while True:
         step += 1
-        nextResult = ((-1)**step / fact([2*step])) * value**(2*step)
+        nextResult = Decimal((-1)**step / fact([2*step])) * value**(2*step)
         tempResult = mainResult + nextResult
         if dif([mainResult, tempResult]) <= threshold:
             break
@@ -204,6 +205,7 @@ def cot(value):
     return rat([cos([value]), sin([value])])
 
 def sec(value):
+    value = value[0]
     return rat([1, cos([value])])
 
 def csc(value):
@@ -228,7 +230,9 @@ def asin(value):
     return meanVal
 
 def acos(value):
-    return pi/2 - asin(value)
+    value = value[0]
+    if value == 1: return 0
+    return pi/2 - asin([value])
 
 def atan(value):
     value = value[0]
@@ -237,8 +241,8 @@ def atan(value):
     b = pi/2
     while loopIndex != 0:
         meanVal = (a + b) / 2
-        if tan([meanVal]) < value: a = meanVal
-        elif tan([meanVal]) > value: b = meanVal
+        if tan([Decimal(meanVal)]) < value: a = meanVal
+        elif tan([Decimal(meanVal)]) > value: b = meanVal
         else: return meanVal
         loopIndex -= 1
     return meanVal
@@ -304,17 +308,22 @@ def acosh(value):
 
 def atanh(value):
     value = value[0]
-    if abs([value]) >= 1: return Decimal("NaN")
+    if abs([value]) > 1: return Decimal("NaN")
+    elif value == 1: return Decimal("Infinity")
+    elif value == -1: return Decimal("-Infinity")
     return 0.5 * ln([rat([1 + value, 1 - value])])
 
 def acoth(value):
     value = value[0]
-    if abs([value]) <= 1: return Decimal("NaN")
+    if abs([value]) < 1: return Decimal("NaN")
+    elif value == 1: return Decimal("Infinity")
+    elif value == -1: return Decimal("-Infinity")
     return 0.5 * ln([rat([value + 1, value - 1])])
 
 def asech(value):
     value = value[0]
-    if value <= 0 or value > 1: return Decimal("NaN")
+    if value < 0 or value > 1: return Decimal("NaN")
+    elif value == 0: return Decimal("Infinity")
     return ln([rat([1, value]) + sqrt([rat([1, value**2]) - 1])])
 
 def acsch(value):
@@ -327,18 +336,18 @@ def acsch(value):
 
 def randInt(value):
     time1 = time() - int(time())
-    time1 = int(time1 * 10**16)
+    time1 = int(time1 * 10**15)
     time1 = time1 << 7
     time1 = time1 >> 11
-    valueDif = dif([value[0], value[1]]) + 1
+    valueDif = dif([value[0], value[1]]) + Decimal(1)
     return time1 % valueDif + value[0]
 
 def rand(value):
     time1 = time() - int(time())
-    time1 = int(time1 * 10**16)
+    time1 = int(time1 * 10**15)
     time1 = time1 << 7
     time1 = time1 >> 11
-    valueDif = dif([value[0], value[1]]) + 10**-15
+    valueDif = dif([value[0], value[1]]) + Decimal(10**-16)
     return time1 % valueDif + value[0]
 
 
@@ -437,22 +446,22 @@ def mode(value):
     return maxValue
 
 def popVar(value):
-    mean = aMean(value)
-    sum = squareSum(value)
-    return 1/len(value) * sum - mean**2
+    mean = Decimal(aMean(value))
+    sum = Decimal(squareSum(value))
+    return Decimal(1/len(value)) * sum - mean**Decimal(2)
 
 def popStdDev(value):
-    return popVar(value)**0.5
+    return popVar(value)**Decimal(0.5)
 
 def samVar(value):
-    mean = aMean(value)
-    sum = 0
+    mean = Decimal(aMean(value))
+    sum = Decimal(0)
     for index in value:
-        sum += (index - mean)**2
-    return 1/(len(value)-1) * sum
+        sum += (index - mean)**Decimal(2)
+    return Decimal(1/(len(value)-1)) * sum
 
 def samStdDev(value):
-    return samVar(value)**0.5
+    return samVar(value)**Decimal(0.5)
 
 def median(value):
     value = insertionSort(value)

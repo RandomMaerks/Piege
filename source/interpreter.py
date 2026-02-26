@@ -19,13 +19,14 @@ mathSyntax = ["sum(", "dif(", "sub(", "pro(", "rat(",
               "cubeSum(", "max(", "min(", "aMean(", "gMean(",
               "agMean(", "median(", "mode(", "quart1(", "quart3(",
               "iqr(", "meanAbsDev(", "medianAbsDev(", "modeAbsDev(",
-              "popVar(", "popStdDev(", "samVar(", "samStdDev("]
+              "popVar(", "popStdDev(", "samVar(", "samStdDev(", "neg(",
+              "asinh(", "acosh(", "atanh(", "acoth(", "asech(", "acsch("]
 
 compSyntax = ["less(", "more(", "equal(",
               "notless(", "notmore(", "notequal("]
 
 # Hardcoded characters to check for each type of data
-numberType = "0123456789.+-e"
+numberType = "0123456789.+-Ee"
 charType = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 # -----------------------------------
@@ -39,10 +40,14 @@ def foundSyntax(data, mainIndex, string):
 def lineByIndex(charIndex, tempLineBreak):
     lineIndex = 0
     for i, x in enumerate(tempLineBreak):
-        if tempLineBreak[i-1] < charIndex and charIndex < x:
+        if tempLineBreak[i-1] <= charIndex and charIndex < x:
             return i
 
 def isNumber(string):
+    try:
+        Decimal(string)
+    except InvalidOperation:
+        return False
     verdict = all(string[i] in numberType for i in range(len(string)))
     return verdict
 
@@ -89,7 +94,7 @@ def executeCode(data):
                 line = lineByIndex(charIndex, tempLineBreak)
                 if line in tempIgnoreLine:
                     charIndex = tempLineBreak[line]
-            except Exception:
+            except Exception as e:
                 pass
     
 
@@ -125,9 +130,13 @@ def executeCode(data):
             # Read, process and save variable-value pair
             try:
                 inputList = open(inputDir, "r").readlines()
-            except Exception:
+            except UnboundLocalError:
                 errorAtLine = lineByIndex(charIndex, tempLineBreak)
-                print(f"Line {errorAtLine}: Cannot open '{inputDir}'.")
+                print(f"Line {errorAtLine}: Missing input directory (syntax: INPUT `type` = `directory`).")
+                return
+            except FileNotFoundError:
+                errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                print(f"Line {errorAtLine}: '{inputDir}' does not exist.")
                 return
             for line in inputList:
                 if "=" not in line:
@@ -135,7 +144,12 @@ def executeCode(data):
                 line = line.replace(" ", "").replace("\n", "")
                 assignIndex = line.find("=")
                 variable = line[:assignIndex]
-                value = Decimal(line[assignIndex+1:])
+                try:
+                    value = Decimal(line[assignIndex+1:])
+                except InvalidOperation:
+                    errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                    print(f"Line {errorAtLine}: Could not read value of variable '{variable}' when trying to read '{inputDir}'.")
+                    return
                 tempVariable.append(variable)
                 tempValue.append(value)
 
@@ -163,7 +177,9 @@ def executeCode(data):
                     charIndex3 = charIndex2
                     detectDir = False
                     while charIndex3 in range(len(data)):
-                        if data[charIndex3] == ("\"" or "'"):
+                        if data[charIndex3] == "\n":
+                            break
+                        elif data[charIndex3] == ("\"" or "'"):
                             if detectDir == False:
                                 detectDir = True
                                 firstInstance = charIndex3+1
@@ -172,15 +188,20 @@ def executeCode(data):
                                 lastInstance = charIndex3
                                 break
                         charIndex3 += 1
-                    outputDir = data[firstInstance:lastInstance]
+                    try:
+                        outputDir = data[firstInstance:lastInstance]
+                    except UnboundLocalError:
+                        errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                        print(f"Line {errorAtLine}: Missing output directory (syntax: OUTPUT `type` = `directory`).")
+                        return
 
                     # Clear previous data
                     try:
                         with open(outputDir, "w+", encoding="utf8") as file:
                             file.write("")
-                    except Exception:
+                    except PermissionError:
                         errorAtLine = lineByIndex(charIndex, tempLineBreak)
-                        print(f"Line {errorAtLine}: Cannot write to '{outputDir}'.")
+                        print(f"Line {errorAtLine}: Cannot write to '{outputDir}' due to permission failure.")
                         return
                 charIndex2 += 1
 
@@ -204,8 +225,25 @@ def executeCode(data):
             code = data[firstInstance:lastInstance].replace(" ", "").split(";")
 
             # Get command and variable to write to
-            tempCommand = code[0]
-            foundVariable = code[1]
+            try:
+                tempCommand = code[0]
+                foundVariable = code[1]
+            except IndexError:
+                errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                print(f"Line {errorAtLine}: Cannot read variable name.")
+                return
+            if len(tempCommand) == 0:
+                errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                print(f"Line {errorAtLine}: No operation found (syntax: DO operation; output).")
+                return
+            elif len(foundVariable) == 0:
+                errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                print(f"Line {errorAtLine}: No output found (syntax: DO operation; output).")
+                return
+            elif isNumber(foundVariable):
+                errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                print(f"Line {errorAtLine}: Variable '{foundVariable}' must not be all numbers.")
+                return
 
             # Separate every object of tempCommand for easier analysis
             separated = tempCommand.replace("(", "(#").replace(",", "#").replace(")", "#)#").split("#")
@@ -213,7 +251,7 @@ def executeCode(data):
 
             # Preparation for executing tempCommand
             indentLevel = 0
-            operatorList    = [] # List of found operators in tempCommand
+            operatorList  = [] # List of found operators in tempCommand
             indentList    = [] # List of indentation levels
             frequencyList = [] # List of frequencies (from leftmost to current location)
 
@@ -232,7 +270,7 @@ def executeCode(data):
                     variable = object
                     try:
                         value = tempValue[tempVariable.index(variable)]
-                    except Exception:
+                    except UnboundLocalError:
                         errorAtLine = lineByIndex(charIndex, tempLineBreak)
                         print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                         return
@@ -258,7 +296,16 @@ def executeCode(data):
                 frequencyOfMax = frequencyList[indexStart]
 
                 # Get entire operation
-                indexEnd = [index for index, object in enumerate(tempCommand) if object == ")" and indentList[index] == indentOfMax][0]
+                listOfEndIndices = [
+                    index for index, object in enumerate(tempCommand) 
+                    if object == ")" and indentList[index] == indentOfMax
+                    ]
+                try:
+                    indexEnd = listOfEndIndices[0]
+                except IndexError:
+                    errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                    print(f"Line {errorAtLine}: Operator '{operatorOfMax}' has no closing syntax.")
+                    return
                 fullOperator = tempCommand[indexStart:indexEnd+1]
 
                 # Get calculable objects
@@ -268,7 +315,11 @@ def executeCode(data):
                 code = getattr(mathPiege, operatorOfMax[:-1])
                 try:
                     answer = Decimal(code(valueList))
-                except Exception:
+                except TypeError:
+                    errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                    print(f"Line {errorAtLine}: Operator '{operatorOfMax}' includes illegal input values: {valueList}.")
+                    return
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Cannot execute operator '{operatorOfMax}'.")
                     return
@@ -285,11 +336,16 @@ def executeCode(data):
             # Write to variable
             if foundVariable not in tempVariable:
                 tempVariable.append(foundVariable)
-                tempValue.append(Decimal(tempCommand))
+                try:
+                    tempValue.append(Decimal(tempCommand))
+                except InvalidOperation:
+                    errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                    print(f"Line {errorAtLine}: Cannot assign '{tempCommand}' to '{foundVariable}'.")
+                    return
             else:
                 try:
                     tempValue[tempVariable.index(foundVariable)] = Decimal(tempCommand)
-                except Exception:
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Cannot assign '{tempCommand}' to variable '{foundVariable}'.")
                     return
@@ -316,17 +372,26 @@ def executeCode(data):
             # Find respective value
             try:
                 value = tempValue[tempVariable.index(variable)]
-            except Exception:
+            except Exception as e:
                 errorAtLine = lineByIndex(charIndex, tempLineBreak)
                 print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                 return
+
+            # Find integer ratio if possible
+            ratioDisplay = ""
+            try:
+                ratio = Decimal(value).as_integer_ratio()
+                if len(str(ratio[0])) < 10 and len(str(ratio[1])) < 10 and ratio[1] != 1:
+                    ratioDisplay = f" ({ratio[0]}/{ratio[1]})"
+            except Exception as e:
+                pass
                 
             # Write to selected output
             if outputMode == "interpreter":
-                print(f"{variable} = {value}")
+                print(f"{variable} = {value}{ratioDisplay}")
             elif outputMode == "directory":
                 with open(outputDir, "a+", encoding="utf8") as file:
-                    file.write(f"{variable} = {value}\n")
+                    file.write(f"{variable} = {value}{ratioDisplay}\n")
 
             charIndex = charIndex2
 
@@ -340,28 +405,50 @@ def executeCode(data):
             # Read through code for display objects
             charIndex2 = charIndex + len("PRINT ")
             firstInstance = charIndex2
+            separatorIndices = [0]
+            inQuotes = False
             while charIndex2 in range(len(data)):
                 if data[charIndex2] == "\n":
+                    separatorIndices.append(charIndex2-firstInstance)
                     lastInstance = charIndex2
                     break
+                if data[charIndex2] == "\"" and data[charIndex2-1] != "\\":
+                    inQuotes = not inQuotes
+                if data[charIndex2] == "," and not inQuotes:
+                    separatorIndices.append(charIndex2-firstInstance)
                 charIndex2 += 1
             inputString = data[firstInstance:lastInstance]
-            display = inputString.replace("\", ", "\",#").split(",#")
+
+            # Separate string and variable names to put into display
+            display = []
+            for index in range(len(separatorIndices)-1):
+                index1 = separatorIndices[index] if index == 0 else separatorIndices[index] + 1
+                index2 = separatorIndices[index+1]
+                string = inputString[index1:index2]
+                if "\"" not in string: string = string.replace(" ", "")
+                else:
+                    if string.startswith(" "):
+                        quoteIndex = string.find("\"")
+                        string = string[quoteIndex:]
+                    if string.endswith(" "):
+                        quoteIndex = len(string) - string[::-1].find("\"")
+                        string = string[:quoteIndex]
+                display.append(string)
 
             # Process all objects in display (replace variable by value, remove quotes)
             for index, object in enumerate(display):
                 if "\"" in object:
-                    display[index] = display[index].replace("\"", "")
+                    display[index] = display[index][1:-1]
                     continue
                 variable = object
                 try:
                     value = tempValue[tempVariable.index(variable)]
-                except Exception:
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
                 display[index] = str(value)
-                
+
             # Write to selected output
             if outputMode == "interpreter":
                 print(''.join(display))
@@ -406,7 +493,7 @@ def executeCode(data):
                 variable = object
                 try:
                     value = tempValue[tempVariable.index(variable)]
-                except Exception:
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -448,7 +535,7 @@ def executeCode(data):
             # Find respective value
             try:
                 value = tempValue[tempVariable.index(variable)]
-            except Exception:
+            except Exception as e:
                 errorAtLine = lineByIndex(charIndex, tempLineBreak)
                 print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                 return
@@ -496,7 +583,7 @@ def executeCode(data):
                 variable = object
                 try:
                     value = tempValue[tempVariable.index(variable)]
-                except Exception:
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -507,7 +594,7 @@ def executeCode(data):
             code = getattr(mathPiege, operator)
             try:
                 verdict = code(values)
-            except Exception:
+            except Exception as e:
                 errorAtLine = lineByIndex(charIndex2, tempLineBreak)
                 print(f"Line {errorAtLine}: Cannot execute comparison \"{comparator}\".")
                 return
@@ -556,7 +643,7 @@ def executeCode(data):
                 variable = object
                 try:
                     value = tempValue[tempVariable.index(variable)]
-                except Exception:
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -567,7 +654,7 @@ def executeCode(data):
             code = getattr(mathPiege, operator)
             try:
                 verdict = code(values)
-            except Exception:
+            except Exception as e:
                 errorAtLine = lineByIndex(charIndex2, tempLineBreak)
                 print(f"Line {errorAtLine}: Cannot execute comparison \"{comparator}\".")
                 return
@@ -599,7 +686,7 @@ def executeCode(data):
             if not isNumber(line):
                 try:
                     value = tempValue[tempVariable.index(line)]
-                except Exception:
+                except Exception as e:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{line}' does not exist.")
                     return
@@ -632,9 +719,9 @@ if __name__ == "__main__":
     timeStart = time()
     executeCode(code)
     timeEnd = time()
-    runtime = round(timeEnd-timeStart, 5)
-    ratio = round(1/runtime, 5)
+    runtime = Decimal(timeEnd-timeStart)
+    ratio = Decimal(1/runtime)
 
     print()
-    print(f"runtime: {runtime} : 1 or 1 : {ratio}")
+    print(f"runtime: {round(runtime, 5)} : 1 or 1 : {round(ratio, 5)}")
     print()

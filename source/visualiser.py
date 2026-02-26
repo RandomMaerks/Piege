@@ -1,17 +1,34 @@
+from decimal import *
+
+# --------------------
 # Magnitude / quantity
+# --------------------
 
 def magnitude(options, inputValues):
+    # Get character display, position of value, and the input values
     charDisplay = str(options[0])
-    display = [charDisplay for a in range(int(inputValues[0]))]
-    return f"{inputValues[0]} {''.join(display)}"
+    position = "after" if len(options) < 2 else str(options[1])
+    value = int(inputValues[0])
+
+    # Make the display
+    display = [charDisplay for _ in range(value)]
+    if position == "after": display = f"{''.join(display)} {value}"
+    else: display = f"{inputValues[0]} {''.join(display)}"
+
+    # Return display
+    return display
 
 
+# ------
 # Matrix
+# ------
 
 def matrix(options, inputValues):
+    # Get notation style and row quantity
     matrixNotation = str(options[0])
     rowQuantity = int(options[1])
 
+    # Prepare left and right brackets/parentheses for later
     maxLength = len(str(inputValues[0]))
     for i in inputValues:
         if maxLength < len(str(i)): maxLength = len(str(i))
@@ -44,6 +61,7 @@ def matrix(options, inputValues):
             leftNotation.append("⎝ ")
             rightNotation.append(" ⎠")
 
+    # Make display
     display = []
     columnQuantity = int(len(inputValues) / rowQuantity)
     for rowIndex in range(rowQuantity):
@@ -51,48 +69,82 @@ def matrix(options, inputValues):
         tempDisplay.append(leftNotation[rowIndex])
         for columnIndex in range(columnQuantity):
             element = inputValues[rowIndex * columnQuantity + columnIndex]
-            space = ''.join([" " for a in range(len(str(element)), maxLength)])
+            space = ''.join([" " for _ in range(len(str(element)), maxLength)])
             tempDisplay.append(f"{element}{space}")
             if columnIndex != columnQuantity - 1:
                 tempDisplay.append("  ")
         tempDisplay.append(rightNotation[rowIndex])
         display.append(''.join(tempDisplay))
+
+    # Return display
     return '\n'.join(display)
 
 
+# -----
 # Graph
+# -----
 
 def graph(options, inputValues):
+    # Get type, scale type, padding and scale factor
     graphType = str(options[0])
+    scaleType = str(options[1])
+    padding = "all" if len(options) < 3 else str(options[2])
+    scaleFactor = 40 if len(options) < 4 else Decimal(options[3])
 
+    # Add additional empty string if inputValues <= 1
+    if len(inputValues) == 0: inputValues = ["", 0]
+    elif len(inputValues) == 1: inputValues = [""] + inputValues
+
+    # Limit scaleFactor
+    if scaleFactor > 100: scaleFactor = Decimal(100)
+    elif scaleFactor <= 0: scaleFactor = Decimal(0.1)
+    
+    # Get max length and max value of input values
     maxLength = len(str(inputValues[0]))
     maxValue = inputValues[1]
     for i in range(int(len(inputValues) / 2)):
         if maxLength < len(str(inputValues[2*i])): maxLength = len(str(inputValues[2*i]))
         if maxValue < inputValues[2*i + 1]: maxValue = inputValues[2*i + 1]
 
+    # Prepare for display
+    if graphType == "bar":
+        decimalSection = ["", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"]
+    elif graphType == "dot":
+        decimalSection = ["•", "•", "•", "•", "•", "•", "•", "•", " "]
+    scalar = maxValue / scaleFactor
+
+    # Make display
     display = []
-    #scalar = 10**(len(str(int(maxValue)))-2)
-    scalar = maxValue / 40
-    decimalSection = ["", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"]
+    if padding in ["all", "noBetween"]:
+        display.append(f"{''.join([" " for _ in range(maxLength)])}▕")
     for i in range(int(len(inputValues) / 2)):
         label = str(inputValues[2*i])
-        space = ''.join([" " for a in range(len(label), maxLength)])
+        space = ''.join([" " for _ in range(len(label), maxLength)])
         value = inputValues[2*i + 1]
-        if graphType == "quantity":
-            barDisplay = ''.join(["▌" for a in range(int(value))])
-        elif graphType == "bar":
+        if scaleType == "literal":
+            if graphType == "bar":
+                graphDisplay = ''.join([decimalSection[4] for _ in range(int(value))])
+            elif graphType == "dot":
+                lastDot = decimalSection[4] if value != 0 else ""
+                graphDisplay = ''.join([decimalSection[8] for _ in range(int(value))]) + lastDot
+        elif scaleType == "scaled":
             scaledValue = value / scalar
             decimal = scaledValue - int(scaledValue)
             secIndex = int(decimal * 8)
-            barDisplay = ''.join(["█" for a in range(int(scaledValue))]) + decimalSection[secIndex]
-        display.append(f"{''.join([" " for a in range(maxLength)])}▕")
-        display.append(f"{label}{space}▕{barDisplay} {value}")
-    display.append(f"{''.join([" " for a in range(maxLength)])}▕")
+            graphDisplay = ''.join([decimalSection[-1] for _ in range(int(scaledValue))]) + decimalSection[secIndex]
+        display.append(f"{label}{space}▕{graphDisplay} {value}")
+        if padding in ["all", "noOuter"] and i != int(len(inputValues) / 2) - 1:
+            display.append(f"{''.join([" " for _ in range(maxLength)])}▕")
+    if padding in ["all", "noBetween"]:
+        display.append(f"{''.join([" " for _ in range(maxLength)])}▕")
+
+    # Return display
     return '\n'.join(display)
 
 
+# -----
 # Table
+# -----
         
 def table(options, inputValues):
     orientation = options[0]
@@ -122,10 +174,10 @@ def table(options, inputValues):
     middleBorder = []
     bottomBorder = []
     if orientation == "row":
-        labelBar = ''.join(["━" for a in range(maxLabelLength+2)])
-        valueBar = ''.join(["━" for a in range(maxValueLength+2)])
+        labelBar = ''.join(["━" for _ in range(maxLabelLength+2)])
+        valueBar = ''.join(["━" for _ in range(maxValueLength+2)])
     elif orientation == "column":
-        labelBar = ''.join(["━" for a in range(maxLength+2)])
+        labelBar = ''.join(["━" for _ in range(maxLength+2)])
         valueBar = labelBar
     topBorder.append("┍" + labelBar)
     middleBorder.append("┝" + labelBar)
@@ -146,9 +198,9 @@ def table(options, inputValues):
             for columnIndex in range(columnQuantity):
                 element = inputValues[rowIndex * columnQuantity + columnIndex]
                 if columnIndex == 0:
-                    space = ''.join([" " for a in range(len(str(element)), maxLabelLength)])
+                    space = ''.join([" " for _ in range(len(str(element)), maxLabelLength)])
                 else:
-                    space = ''.join([" " for a in range(len(str(element)), maxValueLength)])
+                    space = ''.join([" " for _ in range(len(str(element)), maxValueLength)])
                 tempDisplay.append(f"│ {element}{space} ")
             tempDisplay.append("│")
             display.append(''.join(tempDisplay))
@@ -163,7 +215,7 @@ def table(options, inputValues):
             tempDisplay = []
             for elementIndex, element in enumerate(inputValues):
                 if elementIndex % rowQuantityByColumn == rowIndex:
-                    space = ''.join([" " for a in range(len(str(element)), maxLength)])
+                    space = ''.join([" " for _ in range(len(str(element)), maxLength)])
                     tempDisplay.append(f"│ {element}{space} ")
             tempDisplay.append("│")
             display.append(''.join(tempDisplay))
