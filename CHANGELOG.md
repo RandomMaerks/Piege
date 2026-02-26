@@ -1,6 +1,11 @@
-## Piègeur & mathPiège library changelog
+## Piègeur, mathPiege & visualiser library changelog
 
-### v0.3.0 (24 Februrary, 2026)
+### v0.3.1 (27 February, 2026)
+- Fixed operators that were not compatible with the Decimal numbers (error `decimal.InvalidOperation`)
+- Fixed function `PRINT` not detecting a variable if it was put at the end
+- Added some error messages
+
+### v0.3.0 (24 February, 2026)
 - Rewrote all function detection scripts, improving speed
 - Updated interpreter to match with Piège version 2.0 (capitalise function names, remove `io{}` and `op{}`, edit function syntaxes, etc.)
 - Implemented `VISUAL` function & added `visualiser.py`
