@@ -126,7 +126,7 @@ def graph(options, inputValues):
                 graphDisplay = ''.join([decimalSection[4] for _ in range(int(value))])
             elif graphType == "dot":
                 lastDot = decimalSection[4] if value != 0 else ""
-                graphDisplay = ''.join([decimalSection[8] for _ in range(int(value))]) + lastDot
+                graphDisplay = ''.join([decimalSection[8] for _ in range(int(value)-1)]) + lastDot
         elif scaleType == "scaled":
             scaledValue = value / scalar
             decimal = scaledValue - int(scaledValue)

@@ -335,20 +335,26 @@ def acsch(value):
 # Randomiser opeators
 
 def randInt(value):
+    valueStart = Decimal(value[0])
+    valueEnd = Decimal(value[1])
+    valueDif = dif([valueStart, valueEnd]) + Decimal(1)
+
     time1 = time() - int(time())
     time1 = int(time1 * 10**15)
     time1 = time1 << 7
     time1 = time1 >> 11
-    valueDif = dif([value[0], value[1]]) + Decimal(1)
-    return time1 % valueDif + value[0]
+    return time1 % valueDif + valueStart
 
 def rand(value):
-    time1 = time() - int(time())
-    time1 = int(time1 * 10**15)
-    time1 = time1 << 7
-    time1 = time1 >> 11
-    valueDif = dif([value[0], value[1]]) + Decimal(10**-16)
-    return time1 % valueDif + value[0]
+    valueStart = Decimal(value[0])
+    valueEnd = Decimal(value[1])
+    valueDif = dif([valueStart, valueEnd])
+    toNegate = len(str(valueDif)) - 1
+    valueDif += Decimal(10**(-27+toNegate))
+    
+    time1 = Decimal(time() - int(time()))
+    time1 *= Decimal(str(time1)[2:]) * valueDif
+    return time1 % valueDif + valueStart
 
 
 # Vector operators
