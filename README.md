@@ -1,5 +1,5 @@
 <div align="center" style="display: grid; place-items: center;">
-  <img src="https://github.com/RandomMaerks/Piege/blob/main/piege.png" width=13% height=13%>
+  <img src="https://github.com/RandomMaerks/Piege/blob/main/documentation/piege.png" width=13% height=13%>
   <h1>Piège</h1>
   <h3>Repo for the <a href="https://github.com/RandomMaerks/Piege/wiki">Documentation</a> and the Python interpreter</h3>
   <p>Piège v2.1<br>Piègeur v0.3.1 (compatible with Piège v2.1)</p><br>
