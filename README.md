@@ -13,13 +13,17 @@ This is the official repository for the Documentation of the Piège programming 
 
 **Piège** /ˈpɪ.eʒ/ is a mathematically-focused interpreted language which is used to compute various sorts of mathematical operations. Piège files have the `.piege` file extension. Check [the wiki](https://github.com/RandomMaerks/Piege/wiki) for more details.
 
-**Piègeur** /pɪ.ˈe.ʒœ/ is the official Python interpreter for Piège, which is the `piegeur.py` file. The interpreter also uses `mathPiege.py` as a custom-made library for math operations.
+**Piègeur** /pɪ.ˈe.ʒœ/ is the official interpreter for Piège as well as the integrated development environment (IDE) for the language. The interpreter includes by default `mathPiege.py`, a math library, and `visualiser.py`, a library for drawing graphs and visualising numbers.
 
-**Small warning**: The interpreter and the language itself are made by me, an extremely nooby programmer. Tinker around, have fun, and please don't use these things in actual projects. You're also welcome to give feedback and make changes if necessary.
+## Small warning
+
+Firstly, the build of Piègeur IDE is only available for Windows as I only have a Windows machine. If you want to use it on Linux or MacOS, please build it yourself.
+
+Secondly, the interpreter and the language itself are not meant for serious business. Tinker around, write some stuff, and have fun. You're also welcome to give feedback and make changes if necessary.
 
 ## Use Piègeur & code with Piège
 
-Versions of Piègeur after v0.3.0 now have an integrated development environment (IDE) as a portable .exe application.
+Versions of Piègeur after v0.3.0 now have an IDE as a portable .exe application.
 
 To use the interpreter, you can either download the binary from the release page or build it yourself. Make sure you have all the required dependencies (see `requirements`).
 
@@ -39,4 +43,4 @@ py -m PyInstaller --onedir --noconsole --i=resources/piege.ico --version-file=ve
 ``` 
 Make sure the current directory is `../source/`.
 
-There should be a `build` and a `dist` folder. The `.exe` will be placed in the `dist` folder.
+There should be a `build` and a `dist` folder. The executable/binary file will be placed in the `dist` folder, and the file type will depend on your operating system (on Windows, it's an `.exe` file).
