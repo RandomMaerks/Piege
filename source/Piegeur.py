@@ -16,15 +16,26 @@ import contextlib
 class DialogAbout(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+
         self.setWindowTitle("About")
         self.setWindowIcon(QIcon(fugue.icon("information")))
 
         self.setFixedWidth(400)
 
+        self.fontNameUI = "Segoe UI"
+        self.fontSizeUI = 9
+        self.fontNameTextBox = "Consolas"
+        self.fontSizeTextBox = 10
+
         with open("resources/ui_config.txt", "r", encoding="utf8") as file:
             uiConfigFile = file.readlines()
             for line in uiConfigFile:
-                exec(line)
+                if ":" in line:
+                    key, value = line.split(":")
+                    if key == "fontNameUI": self.fontNameUI = value
+                    elif key == "fontSizeUI": self.fontSizeUI = int(value)
+                    elif key == "fontNameTextBox": self.fontNameTextBox = value
+                    elif key == "fontSizeTextBox": self.fontSizeTextBox = int(value)
         
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
         self.buttonBox.setFont(QFont(self.fontNameUI, self.fontSizeUI))
@@ -90,10 +101,20 @@ class DialogUnsaved(QDialog):
         
         self.setFixedWidth(300)
 
+        self.fontNameUI = "Segoe UI"
+        self.fontSizeUI = 9
+        self.fontNameTextBox = "Consolas"
+        self.fontSizeTextBox = 10
+
         with open("resources/ui_config.txt", "r", encoding="utf8") as file:
             uiConfigFile = file.readlines()
             for line in uiConfigFile:
-                exec(line)
+                if ":" in line:
+                    key, value = line.split(":")
+                    if key == "fontNameUI": self.fontNameUI = value
+                    elif key == "fontSizeUI": self.fontSizeUI = int(value)
+                    elif key == "fontNameTextBox": self.fontNameTextBox = value
+                    elif key == "fontSizeTextBox": self.fontSizeTextBox = int(value)
 
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Save |
                                           QDialogButtonBox.Discard |
@@ -365,7 +386,7 @@ class Piegeur(QMainWindow):
 
     def closeEvent(self, event):
         if self.savedState == False and self.currentFile != "None":
-            dialog = DialogUnsaved(self)
+            dialog = DialogUnsaved(parent=self)
             returnValue = dialog.exec()
             if returnValue == 1:
                 self.action_Save()
@@ -391,7 +412,7 @@ class Piegeur(QMainWindow):
         self.codeEditor.insertPlainText(setupString)
 
     def action_AboutDialog(self):
-        dialog = DialogAbout(self)
+        dialog = DialogAbout(parent=self)
         dialog.exec()
 
     def executeScript(self):
@@ -525,7 +546,7 @@ class Piegeur(QMainWindow):
 
     def checkForSaved(self):
         if self.savedState == False and self.currentFile != "None":
-            dialog = DialogUnsaved(self)
+            dialog = DialogUnsaved(parent=self)
             returnValue = dialog.exec()
             if returnValue == 1: self.action_Save()
             elif returnValue == 0: return 0
