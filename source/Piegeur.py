@@ -139,17 +139,28 @@ class Piegeur(QMainWindow):
         # Font config for UI and textboxes
 
         if not os.path.exists("resources/ui_config.txt"):
-            os.makedirs(os.path.dirname("resources/"))
+            if not os.path.exists("resources/"): 
+                os.makedirs(os.path.dirname("resources/"))
             with open("resources/ui_config.txt", "w", encoding="utf8") as file:
-                file.write("self.fontNameUI = \"Segoe UI\"\n"
-                           "self.fontSizeUI = 9\n"
-                           "self.fontNameTextBox = \"Consolas\"\n"
-                           "self.fontSizeTextBox = 10")
+                file.write("fontNameUI:Segoe UI\n"
+                           "fontSizeUI:9\n"
+                           "fontNameTextBox:Consolas\n"
+                           "fontSizeTextBox:10")
+
+        self.fontNameUI = "Segoe UI"
+        self.fontSizeUI = 9
+        self.fontNameTextBox = "Consolas"
+        self.fontSizeTextBox = 10
 
         with open("resources/ui_config.txt", "r", encoding="utf8") as file:
             uiConfigFile = file.readlines()
             for line in uiConfigFile:
-                exec(line)
+                if ":" in line:
+                    key, value = line.split(":")
+                    if key == "fontNameUI": self.fontNameUI = value
+                    elif key == "fontSizeUI": self.fontSizeUI = int(value)
+                    elif key == "fontNameTextBox": self.fontNameTextBox = value
+                    elif key == "fontSizeTextBox": self.fontSizeTextBox = int(value)
                 
         self.currentDir = "c://"
 
@@ -536,8 +547,8 @@ class Piegeur(QMainWindow):
             self.fontSizeTextBox = int(fontData[1])
             with open("resources/ui_config.txt", "r", encoding="utf8") as file:
                 uiConfigFile = file.readlines()
-                uiConfigFile[2] = f"self.fontNameTextBox = \"{self.fontNameTextBox}\"\n"
-                uiConfigFile[3] = f"self.fontSizeTextBox = {self.fontSizeTextBox}"
+                uiConfigFile[2] = f"fontNameTextBox:{self.fontNameTextBox}\n"
+                uiConfigFile[3] = f"fontSizeTextBox:{self.fontSizeTextBox}"
             with open("resources/ui_config.txt", "w", encoding="utf8") as file:
                 file.writelines(uiConfigFile)
 
