@@ -36,7 +36,7 @@ class DialogAbout(QDialog):
             lambda: QDesktopServices.openUrl(QUrl("https://github.com/RandomMaerks/Piege"))
         )
 
-        self.button_License = QPushButton("Check out the official GitHub repo!")
+        self.button_License = QPushButton("License")
         self.button_License.setFont(QFont(self.fontNameUI, self.fontSizeUI))
         self.button_License.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl("https://github.com/RandomMaerks/Piege/blob/main/LICENSE.txt"))
@@ -76,7 +76,8 @@ class DialogAbout(QDialog):
         self.dialogLayout.addWidget(self.label_Subtitle, 1, 0)
         self.dialogLayout.addWidget(self.label_Description, 2, 0, 1, 2)
         self.dialogLayout.addWidget(self.button_InfoPage, 3, 0, 1, 2)
-        self.dialogLayout.addWidget(self.buttonBox, 4, 0, 1, 2)
+        self.dialogLayout.addWidget(self.button_License, 4, 0, 1, 2)
+        self.dialogLayout.addWidget(self.buttonBox, 5, 0, 1, 2)
         self.setLayout(self.dialogLayout)
 
         self.setWindowFlag(Qt.MSWindowsFixedSizeDialogHint)
