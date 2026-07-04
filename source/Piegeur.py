@@ -12,8 +12,6 @@ from time import time
 from threading import Thread
 from io import StringIO
 import contextlib
-import decimal
-
 
 class DialogAbout(QDialog):
     def __init__(self, parent=None):
