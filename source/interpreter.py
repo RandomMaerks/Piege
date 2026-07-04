@@ -708,20 +708,3 @@ def executeCode(data):
             break
 
         charIndex += 1
-
-if __name__ == "__main__":
-    from time import time
-    print()
-    
-    with open("idea.txt", "r", encoding="utf8") as file:
-        code = file.read()
-
-    timeStart = time()
-    executeCode(code)
-    timeEnd = time()
-    runtime = Decimal(timeEnd-timeStart)
-    ratio = Decimal(1/runtime)
-
-    print()
-    print(f"runtime: {round(runtime, 5)} : 1 or 1 : {round(ratio, 5)}")
-    print()

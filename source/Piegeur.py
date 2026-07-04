@@ -410,9 +410,9 @@ class Piegeur(QMainWindow):
         output = outputStream.getvalue()
         self.outputWindow.insertPlainText(output)
 
-        runtime = round((timeEnd - timeStart), 5)
-        multiple = round(1/runtime, 5)
-        self.runtimeWindow.insertPlainText(f"{runtime}s ({runtime} : 1 or 1 : {multiple})")
+        runtime = timeEnd - timeStart
+        multiple = 1 / runtime
+        self.runtimeWindow.insertPlainText(f"{runtime:.5f}s ({runtime:.5f} : 1 or 1 : {multiple:5f})")
 
     def action_Interrupt(self):
         pass
