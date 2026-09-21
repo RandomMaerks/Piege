@@ -33,8 +33,8 @@ charType = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 # |     USEFUL STRING FUNCTIONS     |
 # -----------------------------------
 
-def foundSyntax(data, mainIndex, string):
-    try: return all(data[mainIndex + i] == string[i] for i in range(len(string)))
+def foundSyntax(data, index, string):
+    try: return data[index:index + len(string)] == string
     except IndexError: return None
 
 def lineByIndex(charIndex, tempLineBreak):
@@ -48,11 +48,11 @@ def isNumber(string):
         Decimal(string)
     except InvalidOperation:
         return False
-    verdict = all(string[i] in numberType for i in range(len(string)))
+    verdict = all(char in numberType for char in string)
     return verdict
 
 def isChar(string):
-    verdict = all(string[i] in charType for i in range(len(string)))
+    verdict = all(char in charType for char in string)
     return verdict
 
 # --------------------------
@@ -61,11 +61,14 @@ def isChar(string):
 
 def executeCode(data):
     
-    # Temporary lists for variable-value, line break indices, and ignored index pairs
-    tempVariable     = ["NullValue", "ComplexInfinity", "pi"]
-    tempValue        = [Decimal('NaN'), Decimal('Infinity'), Decimal('3.1415926535897932384626433832795')]
-    tempLineBreak    = [0]
-    tempIgnoreLine   = []
+    # Temporary dict for variable-value, list for line break indices, and list for ignored index pairs
+    tempVariable   = {
+        "NullValue": Decimal('NaN'),
+        "ComplexInfinity": Decimal('Infinity'),
+        "pi": Decimal('3.1415926535897932384626433832795')
+    }
+    tempLineBreak  = [0]
+    tempIgnoreLine = []
 
     # Default output mode
     outputMode = "none"
@@ -75,9 +78,9 @@ def executeCode(data):
         data = data + "\n"
 
     # Find all instances of line break
-    for charIndex in range(len(data)):
-        if data[charIndex] == "\n":
-            tempLineBreak.append(charIndex)
+    for i, char in enumerate(data):
+        if char == "\n":
+            tempLineBreak.append(i)
     
 
     # Start executing code
@@ -150,8 +153,7 @@ def executeCode(data):
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Could not read value of variable '{variable}' when trying to read '{inputDir}'.")
                     return
-                tempVariable.append(variable)
-                tempValue.append(value)
+                tempVariable[variable] = value
 
             charIndex = charIndex2
 
@@ -334,21 +336,14 @@ def executeCode(data):
             tempCommand = ''.join([str(x) for x in tempCommand])
 
             # Write to variable
-            if foundVariable not in tempVariable:
-                tempVariable.append(foundVariable)
-                try:
-                    tempValue.append(Decimal(tempCommand))
-                except InvalidOperation:
-                    errorAtLine = lineByIndex(charIndex, tempLineBreak)
-                    print(f"Line {errorAtLine}: Cannot assign '{tempCommand}' to '{foundVariable}'.")
-                    return
-            else:
-                try:
-                    tempValue[tempVariable.index(foundVariable)] = Decimal(tempCommand)
-                except Exception as e:
-                    errorAtLine = lineByIndex(charIndex, tempLineBreak)
-                    print(f"Line {errorAtLine}: Cannot assign '{tempCommand}' to variable '{foundVariable}'.")
-                    return
+            try:
+                Decimal(tempCommand)
+            except InvalidOperation:
+                errorAtLine = lineByIndex(charIndex, tempLineBreak)
+                print(f"Line {errorAtLine}: Cannot assign '{tempCommand}' to '{foundVariable}'.")
+                return
+
+            tempVariable[foundVariable] = tempCommand
 
             charIndex = charIndex2
 
@@ -371,8 +366,8 @@ def executeCode(data):
 
             # Find respective value
             try:
-                value = tempValue[tempVariable.index(variable)]
-            except Exception as e:
+                value = tempVariable[variable]
+            except KeyError:
                 errorAtLine = lineByIndex(charIndex, tempLineBreak)
                 print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                 return
@@ -442,8 +437,8 @@ def executeCode(data):
                     continue
                 variable = object
                 try:
-                    value = tempValue[tempVariable.index(variable)]
-                except Exception as e:
+                    value = tempVariable[variable]
+                except KeyError:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -492,8 +487,8 @@ def executeCode(data):
                     continue
                 variable = object
                 try:
-                    value = tempValue[tempVariable.index(variable)]
-                except Exception as e:
+                    value = tempVariable[variable]
+                except KeyError:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -532,17 +527,8 @@ def executeCode(data):
                 charIndex2 += 1
             variable = data[firstInstance:lastInstance]
 
-            # Find respective value
-            try:
-                value = tempValue[tempVariable.index(variable)]
-            except Exception as e:
-                errorAtLine = lineByIndex(charIndex, tempLineBreak)
-                print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
-                return
-                
             # Remove
-            tempValue.pop(tempVariable.index(variable))
-            tempVariable.pop(tempVariable.index(variable))
+            tempVariable.pop(variable, None)
 
             charIndex = charIndex2
 
@@ -582,8 +568,8 @@ def executeCode(data):
                     continue
                 variable = object
                 try:
-                    value = tempValue[tempVariable.index(variable)]
-                except Exception as e:
+                    value = tempVariable[variable]
+                except KeyError:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -642,8 +628,8 @@ def executeCode(data):
                     continue
                 variable = object
                 try:
-                    value = tempValue[tempVariable.index(variable)]
-                except Exception as e:
+                    value = tempVariable[variable]
+                except KeyError:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{variable}' does not exist.")
                     return
@@ -685,8 +671,8 @@ def executeCode(data):
             line = data[firstInstance:lastInstance]
             if not isNumber(line):
                 try:
-                    value = tempValue[tempVariable.index(line)]
-                except Exception as e:
+                    value = tempVariable[line]
+                except KeyError:
                     errorAtLine = lineByIndex(charIndex, tempLineBreak)
                     print(f"Line {errorAtLine}: Variable '{line}' does not exist.")
                     return
